@@ -1,0 +1,92 @@
+package lk.ijse.OrderManagementSystem.service.impl;
+
+import lk.ijse.OrderManagementSystem.dto.UserDTO;
+import lk.ijse.OrderManagementSystem.entity.User;
+import lk.ijse.OrderManagementSystem.repository.UserRepository;
+import lk.ijse.OrderManagementSystem.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@Slf4j
+public class UserServiceImpl implements UserService {
+    private UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDTO saveUser(UserDTO userDTO) {
+        log.info("Execute method saveUser()");
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setRole(userDTO.getRole());
+
+        User saveUser = userRepository.save(user);
+        log.info("User Saved ...");
+
+        UserDTO saveUserDTO = new UserDTO();
+        saveUserDTO.setUserId(saveUser.getUserId());
+        saveUserDTO.setUsername(saveUser.getUsername());
+        saveUserDTO.setRole(saveUser.getRole());
+        log.info("Save User Returned ...");
+        return saveUserDTO;
+    }
+
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) {
+        log.info("Execute method updateUser()"+userDTO);
+        try {
+            Optional<User> optionalUser = userRepository.findById(userDTO.getUserId());
+
+            if (!optionalUser.isPresent()/*optionalUser.isEmpty()*/) {
+                throw new RuntimeException("User not found");
+            }
+
+            User user = optionalUser.get();
+
+            user.setUsername(userDTO.getUsername());
+            user.setRole(userDTO.getRole());
+
+            User updatedUser = userRepository.save(user);
+
+            UserDTO responseDTO = new UserDTO();
+
+            responseDTO.setUserId(updatedUser.getUserId());
+            responseDTO.setUsername(updatedUser.getUsername());
+            responseDTO.setRole(updatedUser.getRole());
+
+            log.info("User Updated ...");
+            return responseDTO;
+        } catch (Exception e) {
+            log.error("Error is updatedUser"+e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<UserDTO> getUserDetails() {
+        log.info("Execute method getUsers()");
+        try {
+            log.info("Get Users ...");
+            List<UserDTO> responseList = new ArrayList<>();
+            List<User> usersList = userRepository.findAll();
+            for (User user : usersList) {
+                UserDTO userDTO = new UserDTO();
+                userDTO.setUserId(user.getUserId());
+                userDTO.setUsername(user.getUsername());
+                userDTO.setRole(user.getRole());
+
+                responseList.add(userDTO);
+            }
+            return responseList;
+        } catch (Exception e) {
+            log.error("Error in msg getUsers()"+e.getMessage());
+            throw e;
+        }
+    }
+}
