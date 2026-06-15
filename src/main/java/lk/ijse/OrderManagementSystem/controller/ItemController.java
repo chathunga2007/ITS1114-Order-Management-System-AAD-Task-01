@@ -10,7 +10,7 @@ import static lk.ijse.OrderManagementSystem.constant.ResponseMessage.SUCCESS_MES
 import static lk.ijse.OrderManagementSystem.constant.ResponseStatusCode.OPERATION_SUCCESS;
 
 @RestController
-@RequestMapping(value = "v2/items")
+@RequestMapping(value = "api/items")
 public class ItemController {
     private final ItemService itemService;
 
