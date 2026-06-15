@@ -5,9 +5,7 @@ import lk.ijse.OrderManagementSystem.dto.CustomerDTO;
 import lk.ijse.OrderManagementSystem.service.CustomerService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 import static lk.ijse.OrderManagementSystem.constant.ResponseMessage.SUCCESS_MESSAGE;
 import static lk.ijse.OrderManagementSystem.constant.ResponseStatusCode.OPERATION_SUCCESS;
 
