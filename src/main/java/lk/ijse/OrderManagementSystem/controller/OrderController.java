@@ -30,4 +30,10 @@ public class OrderController {
         List<FilterOrderDTO> filterOrderDTOList = orderService.filterOrders(customerName);
         return new CommonResponse(OPERATION_SUCCESS, filterOrderDTOList, SUCCESS_MESSAGE);
     }
+
+    @GetMapping(value = "/customer/{customerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse getCustomerOrders(@PathVariable Long customerId) {
+        List<FilterOrderDTO> customerOrders = orderService.getOrdersByCustomerId(customerId);
+        return new CommonResponse(OPERATION_SUCCESS, customerOrders, SUCCESS_MESSAGE);
+    }
 }
