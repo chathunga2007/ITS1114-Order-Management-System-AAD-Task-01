@@ -35,4 +35,10 @@ public class UserController {
         List<UserDTO> userDTOS = userService.getUserDetails();
         return new CommonResponse(OPERATION_SUCCESS, userDTOS, SUCCESS_MESSAGE);
     }
+
+    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse getUserDetail(@PathVariable Long userId) {
+        UserDTO userDTO = userService.getUserDetail(userId);
+        return new CommonResponse(OPERATION_SUCCESS, userDTO, SUCCESS_MESSAGE);
+    }
 }
