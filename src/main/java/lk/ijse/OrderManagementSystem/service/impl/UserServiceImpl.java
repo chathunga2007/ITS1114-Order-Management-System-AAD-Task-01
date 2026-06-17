@@ -89,4 +89,25 @@ public class UserServiceImpl implements UserService {
             throw e;
         }
     }
+
+    @Override
+    public UserDTO getUserDetail(Long userId) {
+        log.info("Execute method getUserDetail()");
+        try {
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if (!optionalUser.isPresent()) {
+                throw new RuntimeException("User not found with id: " + userId);
+            }
+            User user = optionalUser.get();
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUserId(user.getUserId());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setRole(user.getRole());
+            log.info("User detail retrieved successfully");
+            return userDTO;
+        } catch (Exception e) {
+            log.error("Error in getUserDetail: {}", e.getMessage());
+            throw e;
+        }
+    }
 }
