@@ -46,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             Order order = new Order();
             order.setTotal(placeOrderDTO.getTotal());
+            order.setOrderDate(new java.util.Date());
 
             Optional<Customer> optionalCustomer = customerRepository.findById(placeOrderDTO.getCustomerId());
             if (optionalCustomer.isEmpty())
@@ -67,6 +68,17 @@ public class OrderServiceImpl implements OrderService {
 
                 orderItem.setOrders(savedOrder);
                 orderItem.setItem(item);
+                orderItem.setOrderItemQTY(1);
+                
+                int price = 0;
+                if (item.getItemPrice() != null) {
+                    try {
+                        price = (int) Double.parseDouble(item.getItemPrice());
+                    } catch (NumberFormatException e) {
+                        log.warn("Failed to parse item price: {}", item.getItemPrice());
+                    }
+                }
+                orderItem.setOrderItemPrice(price);
 
                 orderItemRepository.save(orderItem);
             }
@@ -102,6 +114,8 @@ public class OrderServiceImpl implements OrderService {
                     ItemDTO itemDTO = new ItemDTO();
                     itemDTO.setItemId(item.getItemId());
                     itemDTO.setItemName(item.getItemName());
+                    itemDTO.setItemQTY(item.getItemQTY());
+                    itemDTO.setItemPrice(item.getItemPrice());
 
                     itemDTOList.add(itemDTO);
                 }
@@ -113,6 +127,43 @@ public class OrderServiceImpl implements OrderService {
             return filterOrderDTOS;
         } catch (Exception e) {
             log.error("Error filtering orders");
+            throw e;
+        }
+    }
+
+    @Override
+    public List<FilterOrderDTO> getOrdersByCustomerId(Long customerId) {
+        log.info("Retrieving orders for customer: {}", customerId);
+        try {
+            List<FilterOrderDTO> filterOrderDTOS = new ArrayList<>();
+            List<Order> orderList = orderRepository.getOrdersByCustomerId(customerId);
+
+            for(Order order : orderList){
+                FilterOrderDTO filterOrderDTO = new FilterOrderDTO();
+
+                filterOrderDTO.setOrderId(order.getOrderId());
+                filterOrderDTO.setCustomerName(order.getCustomer().getCustomerName());
+
+                List<ItemDTO> itemDTOList = new ArrayList<>();
+                List<OrderItem> orderItemList = order.getOrderItems();
+
+                for(OrderItem orderItem : orderItemList){
+                    Item item = orderItem.getItem();
+                    ItemDTO itemDTO = new ItemDTO();
+                    itemDTO.setItemId(item.getItemId());
+                    itemDTO.setItemName(item.getItemName());
+                    itemDTO.setItemQTY(item.getItemQTY());
+                    itemDTO.setItemPrice(item.getItemPrice());
+
+                    itemDTOList.add(itemDTO);
+                }
+
+                filterOrderDTO.setItemList(itemDTOList);
+                filterOrderDTOS.add(filterOrderDTO);
+            }
+            return filterOrderDTOS;
+        } catch (Exception e) {
+            log.error("Error retrieving customer orders: {}", e.getMessage());
             throw e;
         }
     }
