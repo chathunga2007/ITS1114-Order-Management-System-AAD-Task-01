@@ -15,4 +15,11 @@ public interface OrderRepository extends JpaRepository<Order,Long> {
     WHERE (?1 IS NULL OR c.customer_name LIKE CONCAT('%', ?1, '%'))
     """, nativeQuery = true)
     List<Order> filterOrders(String customerName);
+
+    @Query(value = """
+    SELECT *
+    FROM orders o
+    WHERE o.customer_customer_id = ?1
+    """, nativeQuery = true)
+    List<Order> getOrdersByCustomerId(Long customerId);
 }
