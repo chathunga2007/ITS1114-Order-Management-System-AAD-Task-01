@@ -30,6 +30,12 @@ public class ItemController {
         return new CommonResponse(OPERATION_SUCCESS, items, SUCCESS_MESSAGE);
     }
 
+    @GetMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse filterItems(@RequestParam(value = "itemName", required = false) String itemName) {
+        List<ItemDTO> filterItemDTOList = itemService.filterItems(itemName);
+        return new CommonResponse(OPERATION_SUCCESS, filterItemDTOList, SUCCESS_MESSAGE);
+    }
+
     @GetMapping (value = "/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResponse getItemDetail(@PathVariable long itemId) {
         ItemDTO itemDTO = itemService.getItemDetail(itemId);
