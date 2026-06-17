@@ -79,6 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
 
             if (!customerOptional.isPresent()) {
                 log.error("Customer with id {} does not exist", id);
+                throw new RuntimeException("Customer not found with id: " + id);
             }
             Customer  customer = customerOptional.get();
             CustomerDTO customerDTO = new CustomerDTO();
@@ -102,6 +103,7 @@ public class CustomerServiceImpl implements CustomerService {
             Optional<Customer> customerOptional = customerRepository.findById(customerDTO.getCustomerId());
             if (!customerOptional.isPresent()) {
                 log.error("Customer with id {} does not exist", customerDTO.getCustomerId());
+                throw new RuntimeException("Customer not found with id: " + customerDTO.getCustomerId());
             }
             Customer customer = customerOptional.get();
             customer.setCustomerName(customerDTO.getCustomerName());
