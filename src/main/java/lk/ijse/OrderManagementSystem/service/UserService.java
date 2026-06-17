@@ -7,4 +7,5 @@ public interface UserService {
     UserDTO saveUser(UserDTO userDTO);
     UserDTO updateUser(UserDTO userDTO);
     List<UserDTO> getUserDetails();
+    UserDTO getUserDetail(Long userId);
 }
