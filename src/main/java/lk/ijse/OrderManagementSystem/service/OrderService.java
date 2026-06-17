@@ -7,4 +7,5 @@ import java.util.List;
 public interface OrderService {
     void placeOrder(PlaceOrderDTO  placeOrderDTO);
     List<FilterOrderDTO> filterOrders(String customerName);
+    List<FilterOrderDTO> getOrdersByCustomerId(Long customerId);
 }
