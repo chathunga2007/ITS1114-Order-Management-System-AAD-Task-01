@@ -22,4 +22,6 @@ public interface OrderRepository extends JpaRepository<Order,Long> {
     WHERE o.customer_customer_id = ?1
     """, nativeQuery = true)
     List<Order> getOrdersByCustomerId(Long customerId);
+
+
 }
