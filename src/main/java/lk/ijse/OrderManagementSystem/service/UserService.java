@@ -1,11 +1,13 @@
 package lk.ijse.OrderManagementSystem.service;
 
-import lk.ijse.OrderManagementSystem.dto.UserDTO;
 import java.util.List;
+
+import lk.ijse.OrderManagementSystem.dto.UserDTO;
 
 public interface UserService {
     UserDTO saveUser(UserDTO userDTO);
     UserDTO updateUser(UserDTO userDTO);
-    List<UserDTO> getUserDetails();
-    UserDTO getUserDetail(Long userId);
+    List<UserDTO> getAllUsers();
+    UserDTO getAllUser(Long userId);
+    UserDTO getUserDetails(String username, String password);
 }
