@@ -1,14 +1,14 @@
 package lk.ijse.OrderManagementSystem.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.stereotype.Service;
 import lk.ijse.OrderManagementSystem.dto.UserDTO;
 import lk.ijse.OrderManagementSystem.entity.User;
 import lk.ijse.OrderManagementSystem.repository.UserRepository;
 import lk.ijse.OrderManagementSystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setRole(userDTO.getRole());
+        user.setPassword(userDTO.getPassword());
 
         User saveUser = userRepository.save(user);
         log.info("User Saved ...");
@@ -33,13 +34,14 @@ public class UserServiceImpl implements UserService {
         saveUserDTO.setUserId(saveUser.getUserId());
         saveUserDTO.setUsername(saveUser.getUsername());
         saveUserDTO.setRole(saveUser.getRole());
+        saveUserDTO.setPassword(saveUser.getPassword());
         log.info("Save User Returned ...");
         return saveUserDTO;
     }
 
     @Override
     public UserDTO updateUser(UserDTO userDTO) {
-        log.info("Execute method updateUser()"+userDTO);
+        log.info("Execute method updateUser()" + userDTO);
         try {
             Optional<User> optionalUser = userRepository.findById(userDTO.getUserId());
 
@@ -51,6 +53,7 @@ public class UserServiceImpl implements UserService {
 
             user.setUsername(userDTO.getUsername());
             user.setRole(userDTO.getRole());
+            user.setPassword(userDTO.getPassword());
 
             User updatedUser = userRepository.save(user);
 
@@ -59,17 +62,18 @@ public class UserServiceImpl implements UserService {
             responseDTO.setUserId(updatedUser.getUserId());
             responseDTO.setUsername(updatedUser.getUsername());
             responseDTO.setRole(updatedUser.getRole());
+            responseDTO.setPassword(updatedUser.getPassword());
 
             log.info("User Updated ...");
             return responseDTO;
         } catch (Exception e) {
-            log.error("Error is updatedUser"+e.getMessage());
+            log.error("Error is updatedUser" + e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public List<UserDTO> getUserDetails() {
+    public List<UserDTO> getAllUsers() {
         log.info("Execute method getUsers()");
         try {
             log.info("Get Users ...");
@@ -79,19 +83,20 @@ public class UserServiceImpl implements UserService {
                 UserDTO userDTO = new UserDTO();
                 userDTO.setUserId(user.getUserId());
                 userDTO.setUsername(user.getUsername());
+                userDTO.setPassword(user.getPassword());
                 userDTO.setRole(user.getRole());
 
                 responseList.add(userDTO);
             }
             return responseList;
         } catch (Exception e) {
-            log.error("Error in msg getUsers()"+e.getMessage());
+            log.error("Error in msg getUsers()" + e.getMessage());
             throw e;
         }
     }
 
     @Override
-    public UserDTO getUserDetail(Long userId) {
+    public UserDTO getAllUser(Long userId) {
         log.info("Execute method getUserDetail()");
         try {
             Optional<User> optionalUser = userRepository.findById(userId);
@@ -102,6 +107,7 @@ public class UserServiceImpl implements UserService {
             UserDTO userDTO = new UserDTO();
             userDTO.setUserId(user.getUserId());
             userDTO.setUsername(user.getUsername());
+            userDTO.setPassword(user.getPassword());
             userDTO.setRole(user.getRole());
             log.info("User detail retrieved successfully");
             return userDTO;
@@ -109,5 +115,21 @@ public class UserServiceImpl implements UserService {
             log.error("Error in getUserDetail: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public UserDTO getUserDetails(String username, String password) {
+        Optional<User> optionalUser = userRepository.findByUsernameAndPassword(username, password);
+        if (!optionalUser.isPresent()) {
+            throw new RuntimeException("user not found");
+        }
+        User user = optionalUser.get();
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(user.getUsername());
+        userDTO.setRole(user.getRole());
+        userDTO.setPassword(user.getPassword());
+
+        return userDTO;
     }
 }
