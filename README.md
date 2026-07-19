@@ -3,6 +3,8 @@
 <div align="center">
 
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-✓-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-✓-black?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-3.x-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
@@ -54,6 +56,7 @@ The **Order Management System** is a Spring Boot REST API backend that manages e
 | Layer        | Technology                          |
 |--------------|-------------------------------------|
 | Framework    | Spring Boot 4.0.6                   |
+| Security     | Spring Security & JWT (jjwt)        |
 | Language     | Java 21                             |
 | ORM          | Spring Data JPA (Hibernate)         |
 | Database     | MySQL                               |
@@ -80,6 +83,7 @@ OrderManagementSystem/
 │   │   │   │   ├── OrderController.java      # Order placement & retrieval
 │   │   │   │   └── UserController.java       # Employee CRUD endpoints
 │   │   │   ├── dto/
+│   │   │   │   ├── AuthDTO.java              # Authentication payload (Credentials)
 │   │   │   │   ├── CustomerDTO.java
 │   │   │   │   ├── FilterOrderDTO.java       # Order view with item list
 │   │   │   │   ├── ItemDTO.java
@@ -100,6 +104,11 @@ OrderManagementSystem/
 │   │   │   │   ├── OrderItemRepository.java
 │   │   │   │   ├── OrderRepository.java      # filterOrders + getOrdersByCustomerId
 │   │   │   │   └── UserRepository.java
+│   │   │   ├── security/
+│   │   │   │   ├── CustomUserDetailsService.java  # Custom UserDetailsService implementation
+│   │   │   │   ├── JwtAuthenticationFilter.java   # Filter to validate JWT token in HTTP header
+│   │   │   │   ├── JwtUtil.java                   # Utility class to generate/validate JWTs
+│   │   │   │   └── SecurityConfig.java            # Spring Security configuration and bean definitions
 │   │   │   ├── service/
 │   │   │   │   ├── CustomerService.java
 │   │   │   │   ├── ItemService.java
@@ -201,6 +210,55 @@ The application will start on: **`http://localhost:8080`**
 | Feature                   | Endpoint                                   |
 |---------------------------|--------------------------------------------|
 | See all my Orders         | `GET /api/orders/customer/{customerId}`    |
+
+---
+
+## 🔐 Authentication & Security
+
+All APIs (except `/api/users/login`) are protected using **Spring Security** and require a stateless **JWT (JSON Web Token)** for authorization.
+
+### 🔑 How to Authenticate (Login)
+
+Send a `POST` request to the login endpoint with your credentials to obtain a JWT token.
+
+*   **Endpoint:** `POST /api/users/login`
+*   **Request Body:**
+    ```json
+    {
+      "userName": "john_doe",
+      "password": "password123"
+    }
+    ```
+*   **Response:**
+    ```json
+    {
+      "status": 0,
+      "body": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "message": "JWT Token"
+    }
+    ```
+    *(The JWT token is returned in the `body` field of the response)*
+
+### 🛡️ Sending Authenticated Requests
+
+For all other protected endpoints, you must include the retrieved JWT token in the HTTP header:
+
+```http
+Authorization: Bearer <your_jwt_token_here>
+```
+
+### 🚦 Endpoint Access Control Matrix
+
+The system enforces Role-Based Access Control (RBAC) based on the user's role (`ADMIN` or `CASHIER`):
+
+| Endpoint Route | HTTP Method | Required Role | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/users/login` | `POST` | *Public (None)* | Authenticate user & get JWT |
+| `/api/users/**` | `POST`, `PUT`, `GET` | `ADMIN` | Manage employee accounts |
+| `/api/customers/**` | `POST`, `PUT`, `GET` | `ADMIN` or `CASHIER` | Manage customer records |
+| `/api/items` | `POST`, `PUT` | `ADMIN` | Create or update inventory items |
+| `/api/items/**` | `GET` | `ADMIN` or `CASHIER` | View and filter inventory items |
+| `/api/orders/**` | `POST`, `GET` | `ADMIN` or `CASHIER` | Place and view orders |
 
 ---
 
